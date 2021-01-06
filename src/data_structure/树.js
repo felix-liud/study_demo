@@ -4,7 +4,7 @@
  * @Description: 树结构
  * @FilePath: \typescript-demo\src\data_structure\树.js
  * @LastEditors: liudong
- * @LastEditTime: 2021-01-05 18:00:02
+ * @LastEditTime: 2021-01-06 10:23:05
  */
 
 
@@ -151,7 +151,79 @@ class BinarySearchTree {
       return this.searchNode(node.right, key);
     }
   }
-
+  
+  // 删除
+  /**
+   * 
+   * 
+  */
+  remove(key) {
+    // 找到要删除的节点，没有就不需要删除
+    // 缓存删除的目标节点
+    let current = this.root;
+    // 删除的目标节点的父节点
+    let parent = null;
+    let isLeftNode = true;
+    while(current.key !== key) {
+      parent = current;
+      if (current.key > key) {
+        current = current.left;
+        isLeftNode = true;
+      } else {
+        current = current.right;
+        isLeftNode = false;
+      }
+      if (current === null) {
+        return false;
+      }
+    }
+    if (!current.left && !current.right) {
+      if (current === this.root) {
+        this.root = null;
+      } else {
+        // 1 删除的节点是叶子节点
+        parent[isLeftNode ? 'left' : 'right'] = null;
+      }
+      return true;
+    }
+    // 2 删除的节点只有一个子节点
+    else if (!current.right) {
+      if (current === this.root) {
+        this.root = current.left
+      } else {
+        parent[isLeftNode ? 'left' : 'right'] = current.left;
+      }
+    }
+    else if (!current.left) {
+      if (current === this.root) {
+        this.root = current.right
+      } else {
+        parent[isLeftNode ? 'left' : 'right'] = current.right;
+      }
+    } else {
+      // 3 删除的节点有两个子节点
+      const left = current.left;
+      const right = current.right;
+      // 找到最右侧节点
+      const maxNode = this.findMaxNode(current);
+      // 删除最右侧节点
+      this.remove(maxNode.key);
+      if (current === this.root) {
+        this.root = maxNode;
+        maxNode.left = left;
+        maxNode.right = right;
+      } else {
+        parent[isLeftNode ? 'left' : 'right'] = maxNode;
+      }
+    }
+  }
+  findMaxNode(node) {
+    let current = node;
+    while(current && current.right) {
+      current = current.right;
+    }
+    return current;
+  }
 }
 
 let t = new BinarySearchTree();
@@ -166,10 +238,10 @@ t.insert(12);
 t.insert(15);
 t.insert(13);
 t.insert(99);
-// console.log(t.root);
+
+console.log(t.remove(9));
 let arr = [];
-// t.postOrderTraversal((key) => {
-//   console.log('key: ', key);
-//   arr.push(key);
-// });
-console.log(t.has(11));
+t.inOrderTraversal((key) => {
+  arr.push(key);
+});
+console.log(t);
